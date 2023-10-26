@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TicketsList from "./components/TicketsList";
 
+import axios from 'axios'
+
 function App() {
+
+  let endpoint = 'http://localhost:8080/api/tickets'
 
   const [tickets, setTickets] = useState([])
 
@@ -21,10 +25,19 @@ function App() {
       })
   }, [])
 
-  const createTicket = (ticket) => {
-    console.log(ticket)
-    setTickets((tickets) => [...tickets, ticket])
+  const createTicket = async (ticket) => {
+    try {
+      const { titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios } = ticket
+      await axios.post(endpoint, { titulo: titulo, descripcion: descripcion, prioridad: prioridad, estado: estado, fecha: fecha, depSolicitante: depSolicitante, comentarios: comentarios })
+    } catch (error) {
+      console.log("Error al intentar insertar")
+    }
   }
+
+  // const createTicket = (ticket) => {
+  //   console.log(ticket)
+  //   setTickets((tickets) => [...tickets, ticket])
+  // }
 
   const updateTicket = (id, titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios) => {
     const ticketsAct = tickets.map((ticket) => {
