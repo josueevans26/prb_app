@@ -20,7 +20,7 @@ function TicketInfo(props) {
         updateTicket(ticket.id, titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios)
     }
 
-    const hanldeModal = (e) => {
+    const hanldeModal = async (e) => {
         e.preventDefault()
         setModal(true)
         if (modal) {

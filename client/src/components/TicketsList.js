@@ -11,7 +11,7 @@ function TicketsList(props) {
         if (tickets.length === 0) {
             setArr([])
         } else {
-            if (busqueda.length !== 0) {
+            if (busqueda) {
                 if (busRes.length === 0) {
                     setArr([])
                 } else {
@@ -21,7 +21,6 @@ function TicketsList(props) {
                 setArr(tickets)
             }
         }
-        console.log("dentro")
     }, [tickets, busqueda, busRes])
 
     //tickets cambia al insertar, eliminar, actualizar un nuevo registro

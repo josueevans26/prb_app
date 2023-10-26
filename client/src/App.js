@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TicketsList from "./components/TicketsList";
-
 import axios from 'axios'
 
 function App() {
@@ -15,49 +14,48 @@ function App() {
   const [busqueda, setBusqueda] = useState('')
 
   useEffect(() => {
-    fetch('/json/datos.json')
-      .then((response) => response.json())
-      .then((jsonData) => {
-        setTickets(jsonData)
-      })
-      .catch((error) => {
-        console.error('Error al cargar el archivo JSON:', error)
-      })
+    getTickets()
   }, [])
+
+  const getTickets = async () => {
+    try {
+      const response = await axios.get(endpoint)
+      setTickets(response.data.result)
+      console.log(`${response.data.message}`);
+    } catch (error) {
+      console.log("Error al obtener tickets")
+    }
+  }
 
   const createTicket = async (ticket) => {
     try {
       const { titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios } = ticket
-      await axios.post(endpoint, { titulo: titulo, descripcion: descripcion, prioridad: prioridad, estado: estado, fecha: fecha, depSolicitante: depSolicitante, comentarios: comentarios })
+      const response = await axios.post(endpoint, { titulo: titulo, descripcion: descripcion, prioridad: prioridad, estado: estado, fecha: fecha, depSolicitante: depSolicitante, comentarios: comentarios })
+      console.log(`${response.data.message} con ID: ${response.data.id}`);
+      getTickets()
     } catch (error) {
       console.log("Error al intentar insertar")
     }
   }
 
-  // const createTicket = (ticket) => {
-  //   console.log(ticket)
-  //   setTickets((tickets) => [...tickets, ticket])
-  // }
-
-  const updateTicket = (id, titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios) => {
-    const ticketsAct = tickets.map((ticket) => {
-      if (ticket.id === id) {
-        return { ...ticket, titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios };
-      }
-      return ticket
-    })
-    setTickets(ticketsAct)
-    console.log();
+  const updateTicket = async (id, titulo, descripcion, prioridad, estado, fecha, depSolicitante, comentarios) => {
+    try {
+      const response = await axios.put(`${endpoint}/${id}`, { titulo: titulo, descripcion: descripcion, prioridad: prioridad, estado: estado, fecha: fecha, depSolicitante: depSolicitante, comentarios: comentarios })
+      console.log(`${response.data.message} updates en: ${response.data.updates}`);
+      getTickets()
+    } catch (error) {
+      console.log("Error al intentar actualizar");
+    }
   }
 
-  const deleteTicket = (id) => {
-    const ticketsAct = tickets.map((ticket) => {
-      if (ticket.id === id) {
-        return null
-      }
-      return ticket
-    })
-    setTickets(ticketsAct.filter((ticket) => ticket !== null))
+  const deleteTicket = async (id) => {
+    try {
+      const response = await axios.delete(`${endpoint}/${id}`)
+      console.log(`${response.data.message} delete en: ${response.data.updates}`);
+      getTickets()
+    } catch (error) {
+      console.log("Error al intentar borrar");
+    }
   }
 
   useEffect(() => {
@@ -68,7 +66,7 @@ function App() {
     setBusqueda(buscar)
     const resultado = tickets.map((ticket) => {
       for (const key in ticket) {
-        if (
+        if (typeof ticket[key] === 'string' &&
           ticket[key].toLowerCase().includes(buscar.toLowerCase())
         ) {
           return ticket
